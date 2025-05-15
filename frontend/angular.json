@@ -35,5 +35,8 @@
       }
     }
   },
-  "defaultProject": "sondage-frontend"
+  "defaultProject": "sondage-frontend",
+  "cli": {
+    "analytics": "9884344e-4b4d-4b4b-9bab-da063a577bda"
+  }
 }
