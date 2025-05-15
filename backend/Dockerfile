@@ -14,6 +14,6 @@ WORKDIR /app
 # copier les paquets installés
 COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
-
+COPY .env .  
 COPY . .
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000"]

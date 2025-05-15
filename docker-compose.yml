@@ -1,20 +1,4 @@
 services:
-
-  # ------------------------
-  # Base de données MongoDB
-  # ------------------------
-  mongo:
-    image: mongo
-    container_name: sondage_mongo
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-  # ------------------------
-  # Backend Python
-  # ------------------------
   backend:
     build:
       context: ./backend
@@ -23,12 +7,10 @@ services:
     container_name: sondage_backend
     restart: unless-stopped
     env_file: ./backend/.env
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/sondagedb
     ports:
       - "5000:5000"
-    depends_on:
-      - mongo
+    # depends_on:
+    #   - mongo
 
   # ------------------------
   # Frontend Angular + Tailwind
