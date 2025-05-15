@@ -1,4 +1,16 @@
-<div class="container mx-auto p-4">
-  <h1 class="text-2xl font-bold mb-4">{{ title }}</h1>
-  <!-- Ton code de composant ici -->
+<div class="container mx-auto max-w-md p-4 bg-white rounded shadow">
+  <h1 class="text-xl font-bold mb-4">{{ title }}</h1>
+  <form (ngSubmit)="onSubmit()" class="space-y-4">
+    <div>
+      <label for="nom" class="block font-semibold">Nom :</label>
+      <input type="text" id="nom" [(ngModel)]="formData.nom" name="nom" class="w-full border px-2 py-1 rounded" required />
+    </div>
+
+    <div>
+      <label for="plat" class="block font-semibold">Plat préféré :</label>
+      <input type="text" id="plat" [(ngModel)]="formData.platPrefere" name="platPrefere" class="w-full border px-2 py-1 rounded" required />
+    </div>
+
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Envoyer</button>
+  </form>
 </div>
