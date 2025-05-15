@@ -1,0 +1,10 @@
+/* src/app/app.component.scss */
+/* Styles pour ton composant AppComponent */
+
+.container {
+  @apply mx-auto p-4;
+}
+
+h1 {
+  @apply text-2xl font-bold mb-4;
+}
