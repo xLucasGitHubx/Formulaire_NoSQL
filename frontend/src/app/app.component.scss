@@ -1,0 +1,6 @@
+/* src/app/app.component.scss */
+/* Styles pour ton composant AppComponent */
+
+.question-card {
+  @apply border p-3 rounded bg-gray-50;
+}

@@ -1,65 +1,119 @@
 <h1 class="text-2xl font-bold mb-4">Créer un sondage</h1>
 
-<form [formGroup]="surveyForm" (ngSubmit)="submit()" class="space-y-6">
-
-  <!-- Nom -->
+<form
+  [formGroup]="surveyForm"
+  (ngSubmit)="submit()"
+  class="space-y-6"
+>
+  <!-- 1) Champ “Nom du sondage” -->
   <div>
     <label class="block mb-1 font-semibold">Nom du sondage</label>
-    <input formControlName="name"
-           class="w-full border px-3 py-2 rounded"
-           placeholder="Ex. Sondage de satisfaction" />
+    <input
+      formControlName="name"
+      type="text"
+      class="w-full border px-3 py-2 rounded"
+      placeholder="Ex. Sondage de satisfaction"
+      required
+    />
   </div>
 
-  <!-- Questions -->
-  <div formArrayName="questions" class="space-y-4">
+  <!-- 2) Zone “Questions” : on lie ici le FormArray 'questions' défini en TS -->
+  <div formArrayName="questions" class="space-y-6">
     <h2 class="text-lg font-semibold">{{ questionLabel() }}</h2>
 
-    <ng-container *ngFor="let q of questions.controls; let i = index">
-      <div [formGroupName]="i" class="question-card space-y-3">
+    <!-- Boucle sur questions.controls (chaque élément est un FormGroup) -->
+    <ng-container *ngFor="let qCtrl of questions.controls; let i = index">
+      <div
+        [formGroupName]="i"
+        class="question-card p-4 border rounded bg-gray-50 space-y-3"
+      >
+        <!-- a) Intitulé de la question -->
+        <div>
+          <label class="block font-medium mb-1">Question {{ i + 1 }}</label>
+          <input
+            formControlName="title"
+            type="text"
+            class="w-full border px-3 py-2 rounded"
+            placeholder="Intitulé de la question"
+            required
+          />
+        </div>
 
-        <!-- Intitulé -->
-        <input formControlName="title"
-               class="w-full border px-3 py-2 rounded"
-               placeholder="Intitulé de la question" />
+        <!-- b) Type de la question -->
+        <div>
+          <label class="block font-medium mb-1">Type</label>
+          <select
+            formControlName="type"
+            class="border px-3 py-2 rounded"
+          >
+            <option value="text">Texte libre</option>
+            <option value="radio">Choix unique</option>
+            <option value="checkbox">Choix multiple</option>
+            <option value="select">Liste déroulante</option>
+          </select>
+        </div>
 
-        <!-- Type -->
-        <select formControlName="type" class="border px-3 py-1 rounded">
-          <option value="text">Texte libre</option>
-          <option value="radio">Choix unique</option>
-          <option value="checkbox">Choix multiple</option>
-          <option value="select">Liste déroulante</option>
-        </select>
-
-        <!-- Options (pour QCM) -->
-        <ng-container *ngIf="q.get('type')!.value !== 'text'">
+        <!-- c) Si le type ≠ "text", on affiche le FormArray “options” -->
+        <ng-container *ngIf="getQuestionType(i) !== 'text'">
           <div formArrayName="options" class="space-y-2">
+            <label class="block font-medium">Options</label>
             <ng-container
-              *ngFor="let opt of q.get('options')['controls']; let j = index">
-              <div [formGroupName]="j" class="flex gap-2">
-                <input [formControlName]="null" class="flex-grow border px-3 py-1 rounded"
-                       placeholder="Option" />
-                <button type="button" (click)="removeOption(i, j)"
-                        class="text-red-600 text-sm">X</button>
+              *ngFor="let optCtrl of getOptions(i).controls; let j = index"
+            >
+              <div class="flex items-center gap-2">
+                <input
+                  [formControlName]="j"
+                  type="text"
+                  class="flex-grow border px-3 py-1 rounded"
+                  placeholder="Texte de l’option"
+                  required
+                />
+                <button
+                  type="button"
+                  (click)="removeOption(i, j)"
+                  class="text-red-600 text-sm"
+                >
+                  ×
+                </button>
               </div>
             </ng-container>
           </div>
-          <button type="button" (click)="addOption(i)"
-                  class="text-sm bg-gray-200 px-2 py-1 rounded">Ajouter option</button>
+          <button
+            type="button"
+            (click)="addOption(i)"
+            class="mt-2 text-sm bg-gray-200 px-2 py-1 rounded"
+          >
+            Ajouter une option
+          </button>
         </ng-container>
 
-        <!-- Supprimer question -->
-        <button type="button" (click)="removeQuestion(i)"
-                class="text-sm text-red-600">Supprimer</button>
+        <!-- d) Bouton “Supprimer cette question” -->
+        <button
+          type="button"
+          (click)="removeQuestion(i)"
+          class="mt-4 text-red-600 text-sm"
+        >
+          Supprimer la question
+        </button>
       </div>
     </ng-container>
   </div>
 
-  <!-- Boutons -->
-  <div class="flex justify-end gap-2">
-    <button type="button" (click)="addQuestion()"
-            class="bg-gray-300 px-4 py-2 rounded">Ajouter une question</button>
-    <button type="submit"
-            class="bg-blue-600 text-white px-6 py-2 rounded"
-            [disabled]="saving()">Enregistrer</button>
+  <!-- 3) Boutons “Ajouter une question” et “Enregistrer” en bas du form -->
+  <div class="flex justify-end gap-2 mt-4">
+    <button
+      type="button"
+      (click)="addQuestion()"
+      class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+    >
+      Ajouter une question
+    </button>
+    <button
+      type="submit"
+      class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+      [disabled]="saving()"
+    >
+      Enregistrer
+    </button>
   </div>
 </form>

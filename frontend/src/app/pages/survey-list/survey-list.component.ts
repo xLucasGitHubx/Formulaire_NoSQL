@@ -8,7 +8,8 @@ import { Survey } from '../../models/survey.model';
   standalone: true,
   selector: 'app-survey-list',
   templateUrl: './survey-list.component.html',
-  imports: [NgFor, RouterLink, AsyncPipe],
+  // ⚠️  AsyncPipe retiré : il n’est pas utilisé dans le template
+  imports: [NgFor, RouterLink],   // ← modification
 })
 export class SurveyListComponent {
   private api = inject(SurveyService);
