@@ -1,0 +1,24 @@
+<h1 class="text-2xl font-bold mb-6">Liste des sondages</h1>
+
+<a routerLink="/create"
+   class="mb-4 inline-block bg-blue-600 text-white px-4 py-2 rounded">
+  Nouveau sondage
+</a>
+
+<ul class="space-y-4">
+  <li *ngFor="let s of surveys()"
+      class="p-4 bg-white rounded shadow flex justify-between items-start">
+    <div>
+      <h2 class="font-semibold text-lg">{{ s.name }}</h2>
+      <p class="text-sm text-gray-500">{{ s.questions.length }} question(s)</p>
+    </div>
+    <div class="flex gap-2">
+      <a [routerLink]="['/survey', s._id]"
+         class="px-3 py-1 bg-green-600 text-white text-sm rounded">Répondre</a>
+      <a [routerLink]="['/edit', s._id]"
+         class="px-3 py-1 bg-yellow-500 text-white text-sm rounded">Éditer</a>
+      <button (click)="delete(s._id)"
+              class="px-3 py-1 bg-red-600 text-white text-sm rounded">Suppr.</button>
+    </div>
+  </li>
+</ul>

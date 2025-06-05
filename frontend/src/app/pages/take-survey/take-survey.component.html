@@ -1,0 +1,64 @@
+<ng-container *ngIf="survey; else loading">
+  <h1 class="text-2xl font-bold mb-4">{{ survey.name }}</h1>
+
+  <form *ngIf="!submitted" [formGroup]="form" (ngSubmit)="submit()" class="space-y-6">
+
+    <!-- boucle questions -->
+    <ng-container *ngFor="let q of survey.questions">
+      <div class="question-card space-y-2">
+        <p class="font-semibold">{{ q.title }}</p>
+
+        <!-- text -->
+        <input *ngIf="q.type === 'text'"
+               [formControlName]="q.title"
+               class="w-full border px-3 py-2 rounded" />
+
+        <!-- choix unique -->
+        <ng-container *ngIf="q.type === 'radio'">
+          <div *ngFor="let opt of q.options">
+            <label class="inline-flex gap-2">
+              <input type="radio" [value]="opt.label" [formControlName]="q.title" />
+              <span>{{ opt.label }}</span>
+            </label>
+          </div>
+        </ng-container>
+
+        <!-- choix multiple -->
+        <ng-container *ngIf="q.type === 'checkbox'">
+          <div *ngFor="let opt of q.options">
+            <label class="inline-flex gap-2">
+              <input type="checkbox"
+                     [value]="opt.label"
+                     (change)="
+                       form.controls[q.title].setValue(
+                         $event.target.checked
+                           ? [...(form.controls[q.title].value || []), opt.label]
+                           : (form.controls[q.title].value || []).filter((v: string) => v !== opt.label)
+                       )
+                     " />
+              <span>{{ opt.label }}</span>
+            </label>
+          </div>
+        </ng-container>
+
+        <!-- select -->
+        <select *ngIf="q.type === 'select'"
+                [formControlName]="q.title"
+                class="border px-3 py-1 rounded">
+          <option *ngFor="let opt of q.options" [value]="opt.label">
+            {{ opt.label }}
+          </option>
+        </select>
+      </div>
+    </ng-container>
+
+    <button type="submit"
+            class="bg-blue-600 text-white px-6 py-2 rounded">Envoyer</button>
+  </form>
+
+  <p *ngIf="submitted" class="text-green-600">Merci pour votre participation !</p>
+</ng-container>
+
+<ng-template #loading>
+  <p>Chargement…</p>
+</ng-template>
