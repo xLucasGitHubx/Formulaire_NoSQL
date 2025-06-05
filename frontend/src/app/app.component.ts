@@ -33,7 +33,19 @@ export class AppComponent {
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.surveyForm = this.fb.group({
       surveyName: ['', Validators.required],
+<<<<<<< HEAD
+      questions: this.fb.array([this.createQuestion()])
+    });
+  }
+
+  private createQuestion(): FormGroup {
+    return this.fb.group({
+      title: ['', Validators.required],
+      type: ['text', Validators.required],
+      options: this.fb.array([])
+=======
       questions: this.fb.array([this.fb.control('', Validators.required)])
+>>>>>>> main
     });
   }
 
@@ -42,7 +54,11 @@ export class AppComponent {
   }
 
   addQuestion(): void {
+<<<<<<< HEAD
+    this.questions.push(this.createQuestion());
+=======
     this.questions.push(new FormControl('', Validators.required));
+>>>>>>> main
   }
 
   removeQuestion(index: number): void {
@@ -51,6 +67,28 @@ export class AppComponent {
       this.addQuestion();
     }
   }
+<<<<<<< HEAD
+
+  getOptions(questionIndex: number): FormArray {
+    return this.questions.at(questionIndex).get('options') as FormArray;
+  }
+
+  addOption(questionIndex: number): void {
+    this.getOptions(questionIndex).push(this.fb.control('', Validators.required));
+  }
+
+  removeOption(questionIndex: number, optionIndex: number): void {
+    this.getOptions(questionIndex).removeAt(optionIndex);
+  }
+
+  onTypeChange(questionIndex: number): void {
+    const q = this.questions.at(questionIndex);
+    if (q.get('type')?.value !== 'choice') {
+      this.getOptions(questionIndex).clear();
+    }
+  }
+=======
+>>>>>>> main
 
   onSubmit(): void {
     if (this.surveyForm.invalid) {
