@@ -33,6 +33,7 @@ export class AppComponent {
   constructor(private fb: FormBuilder, private http: HttpClient) {
     this.surveyForm = this.fb.group({
       surveyName: ['', Validators.required],
+<<<<<<< HEAD
       questions: this.fb.array([this.createQuestion()])
     });
   }
@@ -42,6 +43,9 @@ export class AppComponent {
       title: ['', Validators.required],
       type: ['text', Validators.required],
       options: this.fb.array([])
+=======
+      questions: this.fb.array([this.fb.control('', Validators.required)])
+>>>>>>> main
     });
   }
 
@@ -50,7 +54,11 @@ export class AppComponent {
   }
 
   addQuestion(): void {
+<<<<<<< HEAD
     this.questions.push(this.createQuestion());
+=======
+    this.questions.push(new FormControl('', Validators.required));
+>>>>>>> main
   }
 
   removeQuestion(index: number): void {
@@ -59,6 +67,7 @@ export class AppComponent {
       this.addQuestion();
     }
   }
+<<<<<<< HEAD
 
   getOptions(questionIndex: number): FormArray {
     return this.questions.at(questionIndex).get('options') as FormArray;
@@ -78,6 +87,8 @@ export class AppComponent {
       this.getOptions(questionIndex).clear();
     }
   }
+=======
+>>>>>>> main
 
   onSubmit(): void {
     if (this.surveyForm.invalid) {
