@@ -1,16 +1,24 @@
-<div class="container mx-auto max-w-md p-4 bg-white rounded shadow">
-  <h1 class="text-xl font-bold mb-4">{{ title }}</h1>
-  <form (ngSubmit)="onSubmit()" class="space-y-4">
-    <div>
-      <label for="nom" class="block font-semibold">Nom :</label>
-      <input type="text" id="nom" [(ngModel)]="formData.nom" name="nom" class="w-full border px-2 py-1 rounded" required />
-    </div>
-
-    <div>
-      <label for="plat" class="block font-semibold">Plat préféré :</label>
-      <input type="text" id="plat" [(ngModel)]="formData.platPrefere" name="platPrefere" class="w-full border px-2 py-1 rounded" required />
-    </div>
-
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Envoyer</button>
-  </form>
+<nav-bar></nav-bar>
+<div class="min-h-screen flex flex-col items-center p-4 bg-gray-100">
+  <div class="w-full max-w-2xl bg-white p-6 rounded shadow-md">
+    <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
+    <form [formGroup]="surveyForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label class="block font-semibold mb-1">Nom du sondage :</label>
+        <input type="text" formControlName="surveyName" class="w-full border px-2 py-1 rounded" required>
+      </div>
+      <div formArrayName="questions" class="space-y-4">
+        <div *ngFor="let ctrl of questions.controls; index as i" class="question-card">
+          <label class="block font-semibold mb-1">Question {{ i + 1 }}</label>
+          <input type="text" [formControlName]="i" class="w-full border px-2 py-1 rounded" placeholder="Intitulé de la question" required>
+          <button type="button" (click)="removeQuestion(i)" class="text-sm text-red-600 mt-1">Supprimer</button>
+        </div>
+      </div>
+      <button type="button" (click)="addQuestion()" class="bg-gray-200 text-sm px-2 py-1 rounded">Ajouter une question</button>
+      <div class="text-right">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Enregistrer</button>
+      </div>
+    </form>
+  </div>
+  <app-footer class="w-full mt-8"></app-footer>
 </div>
