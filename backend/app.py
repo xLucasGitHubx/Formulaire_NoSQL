@@ -10,7 +10,7 @@ load_dotenv()
 
 # Initialiser Flask
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configuration
 MONGO_URI    = os.getenv("MONGO_URI")          # ex: mongodb://localhost:27017
@@ -86,7 +86,22 @@ def get_survey_by_id(survey_id):
     }), 200
 
 
-@app.route("/api/surveys", methods=["POST"])
+@app.route("/api/responses", methods=["POST"])
+def post_response():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Données manquantes"}), 400
+
+    try:
+        result = db.reponses.insert_one(data)
+        app.logger.info(f"[DEBUG] Insert réussi, nouvel _id → {result.inserted_id}")
+    except Exception as e:
+        app.logger.error(f"[ERROR] Échec de l’insertion : {e!r}")
+        return jsonify({"error": "Impossible d’enregistrer la réponse"}), 500
+
+    return jsonify({"message": "Réponse enregistrée", "id": str(result.inserted_id)}), 201
+
+
 def create_survey():
     data = request.get_json()
     if not data or "name" not in data or "questions" not in data:
