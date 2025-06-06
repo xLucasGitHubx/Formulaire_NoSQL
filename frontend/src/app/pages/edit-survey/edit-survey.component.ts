@@ -46,24 +46,27 @@ export class EditSurveyComponent implements OnInit {
       next: (survey: Survey) => {
         this.surveyForm.patchValue({ name: survey.name });
         survey.questions.forEach(q => {
+          console.log('Options question:', q.options);
           const group = this.fb.group({
             title: [q.title, Validators.required],
             type: [q.type, Validators.required],
             options: this.fb.array([])
           });
 
+          // Préremplir les options si la question n'est pas de type 'text'
           if (q.type !== 'text' && Array.isArray(q.options)) {
-            const optsFA = group.get('options') as FormArray;
-            q.options.forEach((opt: QuestionOption) => {
-              optsFA.push(this.fb.control(opt.label, Validators.required));
-            });
-          }
+          const optsFA = group.get('options') as FormArray;
+          // <-- ici, opt est une simple string, pas un objet
+          q.options.forEach((opt: string) => {
+            optsFA.push(this.fb.control(opt, Validators.required));
+          });
+        }
 
           this.questions.push(group);
         });
         this.loading = false;
       },
-      error: err => {
+      error: () => {
         this.errorMessage = 'Erreur lors du chargement du sondage.';
         this.loading = false;
       }
@@ -79,8 +82,8 @@ export class EditSurveyComponent implements OnInit {
   }
 
   hasUnsaved(): boolean {
-  return this.surveyForm.dirty;
-}
+    return this.surveyForm.dirty;
+  }
 
   removeQuestion(index: number): void {
     this.questions.removeAt(index);

@@ -1,6 +1,4 @@
-export interface QuestionOption {
-  label: string;
-}
+export type QuestionOption = string;
 
 export type QuestionType = 'text' | 'radio' | 'checkbox' | 'select';
 
