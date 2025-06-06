@@ -10,6 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';            // ← IMPORT NÉCESSAIRE
 import { SurveyService } from '../../services/survey.service';
+import { AuthService } from '../../services/auth.service';
 import { Survey, QuestionType } from '../../models/survey.model';
 
 @Component({
@@ -26,6 +27,7 @@ export class CreateSurveyComponent {
   private fb = inject(FormBuilder);
   private api = inject(SurveyService);
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   saving = signal(false);
 
@@ -93,7 +95,6 @@ export class CreateSurveyComponent {
     }
     this.saving.set(true);
 
-    // on caste ici le résultat en Survey
     const payload = this.surveyForm.getRawValue() as Survey;
 
     this.api.create(payload).subscribe({

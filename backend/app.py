@@ -4,6 +4,11 @@ from flask import Flask, request, jsonify
 from pymongo import MongoClient
 from flask_cors import CORS
 from dotenv import load_dotenv
+from bson import ObjectId
+import jwt
+import datetime
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # Charger les variables d'environnement
 load_dotenv()
@@ -26,6 +31,34 @@ app.logger.info(f"[DEBUG] MONGO_DBNAME → {MONGO_DBNAME!r}")
 client = MongoClient(MONGO_URI)
 db = client[MONGO_DBNAME]
 app.logger.info(f"[DEBUG] Database connectée → {db.name!r}")
+
+JWT_SECRET = os.getenv("JWT_SECRET", "dev_secret")
+JWT_EXPIRATION = 60 * 60 * 24  # 24h
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        app.logger.info(f"[DEBUG] Authorization header: {request.headers.get('Authorization')}")
+        if "Authorization" in request.headers:
+            parts = request.headers["Authorization"].split()
+            if len(parts) == 2 and parts[0] == "Bearer":
+                token = parts[1]
+        if not token:
+            return jsonify({"error": "Token manquant"}), 401
+        try:
+            data = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+            user_id = data["user_id"]
+            oid = ObjectId(user_id)  # <-- conversion ici
+            user = db.users.find_one({"_id": oid})
+            if not user:
+                raise Exception("Utilisateur inconnu")
+            request.user = user
+        except Exception as e:
+            app.logger.error(f"[ERROR] Token invalide: {e!r}")
+            return jsonify({"error": "Token invalide"}), 401
+        return f(*args, **kwargs)
+    return decorated
 
 # Route de test
 @app.route("/", methods=["GET"])
@@ -56,6 +89,7 @@ def post_reponse():
 # ─── Routes pour gérer les “surveys” ─────────────────────────────────────────────
 
 @app.route("/api/surveys", methods=["GET"])
+@token_required
 def get_all_surveys():
     surveys = []
     for doc in db.surveys.find():
@@ -68,6 +102,7 @@ def get_all_surveys():
 
 
 @app.route("/api/surveys/<string:survey_id>", methods=["GET"])
+@token_required
 def get_survey_by_id(survey_id):
     from bson import ObjectId
     try:
@@ -87,6 +122,7 @@ def get_survey_by_id(survey_id):
 
 
 @app.route("/api/responses", methods=["POST"])
+@token_required
 def post_response():
     data = request.get_json()
     if not data:
@@ -102,6 +138,8 @@ def post_response():
     return jsonify({"message": "Réponse enregistrée", "id": str(result.inserted_id)}), 201
 
 
+@app.route("/api/surveys", methods=["POST"])
+@token_required
 def create_survey():
     data = request.get_json()
     if not data or "name" not in data or "questions" not in data:
@@ -130,6 +168,7 @@ def create_survey():
 
 
 @app.route("/api/surveys/<string:survey_id>", methods=["PUT"])
+@token_required
 def update_survey(survey_id):
     from bson import ObjectId
     try:
@@ -162,6 +201,7 @@ def update_survey(survey_id):
 
 
 @app.route("/api/surveys/<string:survey_id>", methods=["DELETE"])
+@token_required
 def delete_survey(survey_id):
     from bson import ObjectId
     try:
@@ -174,6 +214,34 @@ def delete_survey(survey_id):
         return jsonify({"error": "Survey introuvable"}), 404
 
     return "", 204
+
+
+@app.route("/api/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    if not data or not data.get("email") or not data.get("password"):
+        return jsonify({"error": "Email et mot de passe requis"}), 400
+    if db.users.find_one({"email": data["email"]}):
+        return jsonify({"error": "Email déjà utilisé"}), 409
+    hashed_pw = generate_password_hash(data["password"])
+    user = {"email": data["email"], "password": hashed_pw}
+    db.users.insert_one(user)
+    return jsonify({"message": "Compte créé"}), 201
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    if not data or not data.get("email") or not data.get("password"):
+        return jsonify({"error": "Email et mot de passe requis"}), 400
+    user = db.users.find_one({"email": data["email"]})
+    if not user or not check_password_hash(user["password"], data["password"]):
+        return jsonify({"error": "Identifiants invalides"}), 401
+    token = jwt.encode({
+        "user_id": str(user["_id"]),
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=JWT_EXPIRATION)
+    }, JWT_SECRET, algorithm="HS256")
+    return jsonify({"token": token}), 200
 
 
 # Lancement de l'application

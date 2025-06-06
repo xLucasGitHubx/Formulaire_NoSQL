@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Survey } from '../models/survey.model';
@@ -23,5 +23,9 @@ export class SurveyService {
   }
   getById(id: string): Observable<Survey> {
     return this.http.get<Survey>(`${this.API}/${id}`);
+  }
+
+  submitResponse(response: any) {
+    return this.http.post('http://localhost:9000/api/responses', response);
   }
 }

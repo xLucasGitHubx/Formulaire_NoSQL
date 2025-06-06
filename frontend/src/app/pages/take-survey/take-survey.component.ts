@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { SurveyService } from '../../services/survey.service';
 import { FormBuilder, FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIf, NgFor, NgSwitch, NgSwitchCase } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -16,6 +17,7 @@ export class TakeSurveyComponent {
   private api = inject(SurveyService);
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
+  private auth = inject(AuthService);
 
   survey: any;
   form!: FormGroup;
@@ -64,7 +66,7 @@ export class TakeSurveyComponent {
 
   submit() {
     if (this.form.invalid) return;
-    this.api['http'].post('http://localhost:9000/api/responses', {
+    this.api.submitResponse({
       surveyId: this.survey._id,
       answers: this.form.value,
     }).subscribe(() => (this.submitted = true));
