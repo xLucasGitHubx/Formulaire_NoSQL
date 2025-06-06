@@ -9,7 +9,7 @@ export interface WithUnsavedChanges {
 export const exitIfUnsaved: CanDeactivateFn<WithUnsavedChanges> =
   (component): Observable<boolean> | boolean => {
     if (component.hasUnsaved()) {
-      return confirm('Vous avez des changements non enregistrés, quitter ?');
+      return confirm('Vous avez des changements, enregistrer?');
     }
     return true;
   };

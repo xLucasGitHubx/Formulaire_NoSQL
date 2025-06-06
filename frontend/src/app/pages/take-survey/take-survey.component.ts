@@ -25,7 +25,22 @@ export class TakeSurveyComponent {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.api.getById(id).subscribe(s => {
       this.survey = s;
+      this.normalizeTypes();
       this.buildForm();
+    });
+  }
+
+  /** Harmonise les types pour le ngSwitch du template */
+  normalizeTypes() {
+    this.survey.questions.forEach((q: any) => {
+      // Harmonisation des types pour le template
+      if (q.type === 'single-choice') q.type = 'radio';
+      if (q.type === 'multiple-choice') q.type = 'checkbox';
+      if (q.type === 'dropdown') q.type = 'select';
+      // Si options est un tableau de string, transforme-le en [{label: ...}]
+      if (Array.isArray(q.options) && typeof q.options[0] === 'string') {
+        q.options = q.options.map((label: string) => ({ label }));
+      }
     });
   }
 
