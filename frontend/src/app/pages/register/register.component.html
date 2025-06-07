@@ -1,0 +1,15 @@
+<h1 class="text-2xl font-bold mb-4">Créer un compte</h1>
+<form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4 max-w-sm mx-auto">
+  <div>
+    <label>Email</label>
+    <input formControlName="email" type="email" class="w-full border px-3 py-2 rounded" required>
+  </div>
+  <div>
+    <label>Mot de passe</label>
+    <input formControlName="password" type="password" class="w-full border px-3 py-2 rounded" required>
+  </div>
+  <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Créer le compte</button>
+  <p *ngIf="error" class="text-red-600">{{ error }}</p>
+  <p *ngIf="success" class="text-green-600">{{ success }}</p>
+  <p class="mt-2 text-sm">Déjà inscrit ? <a routerLink="/login" class="text-blue-600">Connexion</a></p>
+</form>

@@ -1,0 +1,102 @@
+<!-- Chemin : frontend/src/app/pages/edit-survey/edit-survey.component.html -->
+
+<ng-container *ngIf="!loading; else loadingTpl">
+  <h1 class="text-2xl font-bold mb-4">Éditer un sondage</h1>
+
+  <form [formGroup]="surveyForm" (ngSubmit)="submit()" class="space-y-6">
+    <!-- Nom du sondage -->
+    <div>
+      <label class="block mb-1 font-semibold">Nom du sondage</label>
+      <input
+        type="text"
+        formControlName="name"
+        class="w-full border px-3 py-2 rounded"
+        required
+      />
+    </div>
+
+    <!-- Questions -->
+    <div formArrayName="questions" class="space-y-6">
+      <div *ngFor="let question of questions.controls; let i = index" [formGroupName]="i" class="border p-4 rounded">
+        <label class="block mb-1 font-semibold">Question {{ i + 1 }}</label>
+        <input
+          type="text"
+          formControlName="title"
+          class="w-full border px-3 py-2 rounded mb-2"
+          placeholder="Intitulé de la question"
+          required
+        />
+
+        <label class="block mb-1 font-semibold">Type de question</label>
+        <select formControlName="type" class="w-full border px-3 py-2 rounded mb-2">
+          <option value="text">Texte libre</option>
+          <option value="single-choice">Choix unique</option>
+          <option value="multiple-choice">Choix multiple</option>
+          <option value="dropdown">Liste déroulante</option>
+        </select>
+
+        <!-- Options pour choix unique, multiple ou dropdown -->
+        <div *ngIf="question.get('type')?.value !== 'text'" formArrayName="options" class="space-y-2">
+          <label class="block font-medium">Options</label>
+          <ng-container *ngFor="let optCtrl of getOptions(i).controls; let j = index">
+            <div class="flex items-center gap-2">
+              <input
+                [formControlName]="j"
+                type="text"
+                class="flex-grow border px-3 py-1 rounded"
+                placeholder="Texte de l’option"
+                required
+              />
+              <button
+                type="button"
+                (click)="removeOption(i, j)"
+                class="text-red-600 text-sm"
+                aria-label="Supprimer l’option"
+              >
+                ×
+              </button>
+            </div>
+          </ng-container>
+          <button
+            type="button"
+            (click)="addOption(i)"
+            class="mt-2 bg-gray-200 px-3 py-1 rounded text-sm"
+          >
+            Ajouter une option
+          </button>
+        </div>
+
+        <button
+          type="button"
+          (click)="removeQuestion(i)"
+          class="mt-4 text-red-600 text-sm"
+          aria-label="Supprimer la question"
+        >
+          Supprimer la question
+        </button>
+      </div>
+    </div>
+
+    <div class="flex justify-between mt-6">
+      <button
+        type="button"
+        (click)="addQuestion()"
+        class="bg-gray-200 px-4 py-2 rounded text-sm"
+      >
+        Ajouter une question
+      </button>
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Enregistrer
+      </button>
+    </div>
+
+    <p *ngIf="errorMessage" class="text-red-600 mt-4">{{ errorMessage }}</p>
+  </form>
+</ng-container>
+
+<ng-template #loadingTpl>
+  <p class="text-gray-600">Chargement des données…</p>
+</ng-template>
