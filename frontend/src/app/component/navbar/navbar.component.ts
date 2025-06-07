@@ -1,11 +1,12 @@
-import { Component, computed, effect, signal, inject } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 
 @Component({
   selector: 'nav-bar',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -32,6 +33,8 @@ export class NavbarComponent {
   logout() {
     // Fonction de déconnexion
     localStorage.removeItem('token');
-    this.token.set(null); // Met à jour le signal pour refléter la déconnexion
+    this.token.set(null);
+    location.replace(location.origin);
+
   }
 }
